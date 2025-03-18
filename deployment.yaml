@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: predator-app
+  labels:
+    app: predator
+    tier: production
+    cloud: gcp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: predator
+  template:
+    metadata:
+      labels:
+        app: predator
+    spec:
+      containers:
+      - name: predator
+        image: gcr.io/YOUR_PROJECT_ID/predator:latest
+        envFrom:
+        - secretRef:
+            name: db-credentials
+        ports:
+        - containerPort: 8000  # API порт (унікальний)
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "512Mi"
+          requests:
+            cpu: "0.2"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: predator-app-config
+          items:
+          - key: nginx.conf
+            path: default.conf

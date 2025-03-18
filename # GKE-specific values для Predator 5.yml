@@ -1,0 +1,61 @@
+# GKE-specific values для Predator 5.0
+
+# Використовуємо GKE-специфічні налаштування
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+ingress:
+  enabled: true
+  className: "gce"
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "predator-static-ip"
+    networking.gke.io/managed-certificates: "predator-certificate"
+    kubernetes.io/ingress.class: "gce"
+  hosts:
+    - host: predator.example.com  # Замініть на ваш фактичний домен
+      paths:
+        - path: /*
+          pathType: Prefix
+
+# Налаштування для Cloud SQL (PostgreSQL)
+database:
+  host: "127.0.0.1"  # Для Cloud SQL proxy
+  port: 5432
+  user: postgres
+  database: predator
+  existingSecret: predator-db-credentials
+
+# Додаткові налаштування для GKE
+cloudsql:
+  enabled: true
+  instanceConnectionName: "project-id:region:instance-name"  # Замініть своїми даними
+  serviceAccountSecret: "cloudsql-service-account"
+
+# Конфігурація для GKE Autopilot (якщо використовується)
+resources:
+  apiserver:
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+    requests:
+      cpu: 500m
+      memory: 1024Mi
+  worker:
+    limits:
+      cpu: 2000m
+      memory: 4096Mi
+    requests:
+      cpu: 1000m
+      memory: 2048Mi
+
+# Додаємо Google Cloud Storage для статичних файлів
+storage:
+  type: gcs
+  bucket: "predator-static-files"
+
+# Використовуємо Google Secret Manager
+secretManager:
+  enabled: true
+  projectId: "predator-project"  # Замініть на ваш Project ID

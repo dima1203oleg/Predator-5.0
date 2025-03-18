@@ -1,0 +1,40 @@
+# Snyk (https://snyk.io) policy file
+version: v1.25.0
+
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  'SNYK-PYTHON-CRYPTOGRAPHY-6418':
+    - '*':
+        reason: 'False positive, using patched version'
+        expires: 2024-12-31T00:00:00.000Z
+        
+  'SNYK-PYTHON-PYYAML-590151':
+    - '*':
+        reason: 'Risk accepted, no sensitive YAML loading'
+        expires: 2024-12-31T00:00:00.000Z
+
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-PYTHON-REQUESTS-72435:
+    - requests:
+        patched: '2023-12-01T00:00:00.000Z'
+
+exclude:
+  global:
+    - tests/**
+    - docs/**
+
+severity-threshold: high
+exclude-directories:
+  - tests
+  - docs
+  - .git
+  - __pycache__
+  
+scan:
+  enable-npm: false
+  enable-maven: false
+  enable-pip: true
+  
+monitor:
+  frequency: daily

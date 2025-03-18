@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: predator-service
+  namespace: predator
+spec:
+  selector:
+    app: predator
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000  # з deployment.yaml
+      name: http
+  type: LoadBalancer

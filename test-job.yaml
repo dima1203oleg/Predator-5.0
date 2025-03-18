@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: app-test-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: curl-test
+        image: curlimages/curl:latest
+        command: ["curl", "-s", "http://my-application-service"]
+      restartPolicy: Never
+  backoffLimit: 2

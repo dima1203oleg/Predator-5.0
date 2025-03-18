@@ -1,0 +1,56 @@
+# Конфігурація для GKE кластера Predator 5.0
+
+# Базова конфігурація кластера GKE
+apiVersion: container.gke.io/v1
+kind: Cluster
+metadata:
+  name: predator-cluster
+  location: europe-west4
+spec:
+  releaseChannel:
+    channel: STABLE
+  # Версія Kubernetes
+  kubernetesVersion: "1.27"
+  # Налаштування мережі
+  networkConfig:
+    enableIntraNodeVisibility: true
+  # Конфігурація вузлів
+  nodePools:
+    - name: default-pool
+      config:
+        machineType: e2-standard-2
+        diskSizeGb: 100
+        diskType: pd-standard
+        imageType: COS_CONTAINERD
+        # Увімкнення Workload Identity
+        workloadMetadataConfig:
+          mode: GKE_METADATA
+      initialNodeCount: 3
+      # Автоскейлінг вузлів
+      autoscaling:
+        enabled: true
+        minNodeCount: 1
+        maxNodeCount: 5
+      management:
+        autoRepair: true
+        autoUpgrade: true
+  # Налаштування безпеки
+  masterAuthorizedNetworksConfig:
+    enabled: false  # Вимкнено для тестування, увімкнути в продакшні
+  # Логування і моніторинг
+  loggingConfig:
+    componentConfig:
+      enableComponents:
+        - SYSTEM_COMPONENTS
+        - WORKLOADS
+  monitoringConfig:
+    componentConfig:
+      enableComponents:
+        - SYSTEM_COMPONENTS
+  # Налаштування для Workload Identity
+  workloadIdentityConfig:
+    workloadPool: ${PROJECT_ID}.svc.id.goog
+  # Адреси IP (автоматичні)
+  ipAllocationPolicy:
+    useIpAliases: true
+    createSubnetwork: true

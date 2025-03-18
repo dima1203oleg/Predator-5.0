@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kubernetes-diagnostics
+spec:
+  template:
+    spec:
+      containers:
+      - name: diagnostics
+        image: bitnami/kubectl:latest
+        command:
+        - "/bin/sh"
+        - "-c"
+        - |
+          echo "=== Перевірка Kubernetes кластера ==="
+          echo "Версія Kubernetes:"
+          kubectl version --short
+          echo "\n=== Перевірка вузлів ==="
+          kubectl get nodes -o wide
+          echo "\n=== Перевірка подів ==="
+          kubectl get pods -o wide -A
+          echo "\n=== Перевірка сервісів ==="
+          kubectl get services -A
+          echo "\n=== Перевірка конфігурації додатку ==="
+          kubectl describe deployment my-application
+          echo "\n=== Тестування доступу до додатку ==="
+          wget -qO- --timeout=2 http://my-application-service || echo "Додаток недоступний"
+          echo "\n=== Діагностика завершена ==="
+      restartPolicy: Never
+  backoffLimit: 1

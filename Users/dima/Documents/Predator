@@ -1,0 +1,66 @@
+import pytest
+import os
+import asyncpg
+from asyncio import get_event_loop
+
+@pytest.mark.asyncio
+async def test_db_connection():
+    """Test that we can connect to the test database"""
+    # Get connection parameters from environment variables
+    host = os.environ.get('POSTGRES_HOST', 'localhost')
+    port = os.environ.get('POSTGRES_PORT', '5432')
+    user = os.environ.get('POSTGRES_USER', 'test_user')
+    password = os.environ.get('POSTGRES_PASSWORD', 'test_password')
+    database = os.environ.get('POSTGRES_DB', 'test_db')
+    
+    # Try to connect
+    conn = None
+    try:
+        conn = await asyncpg.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database
+        )
+        
+        # Simple query to verify connection
+        version = await conn.fetchval('SELECT version()')
+        
+        # Assert that we got a PostgreSQL version string
+        assert 'PostgreSQL' in version
+        
+    finally:
+        # Close connection if it was opened
+        if conn:
+            await conn.close()
+
+
+@pytest.mark.asyncio
+async def test_auth_tables_exist():
+    """Test that the authentication tables exist in the database"""
+    # Get connection parameters from environment variables
+    host = os.environ.get('POSTGRES_HOST', 'localhost')
+    port = os.environ.get('POSTGRES_PORT', '5432')
+    user = os.environ.get('POSTGRES_USER', 'test_user')
+    password = os.environ.get('POSTGRES_PASSWORD', 'test_password')
+    database = os.environ.get('POSTGRES_DB', 'test_db')
+    
+    # Try to connect
+    conn = None
+    try:
+        conn = await asyncpg.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database
+        )
+        
+        # Check for required tables
+        required_tables = [
+            'users',
+            'user_roles',
+            'user_activity',
+            'two_factor_auth',
+            'password_reset_tokens',

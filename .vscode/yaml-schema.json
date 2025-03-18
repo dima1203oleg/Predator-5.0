@@ -1,0 +1,3 @@
+{
+  "*.yml": "https://json.schemastore.org/docker-compose.json"
+}

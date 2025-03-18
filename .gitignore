@@ -172,3 +172,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+.qodo
+
+.env
+.env.test
+*.pyc
+__pycache__/
+.pytest_cache/
+.coverage
+coverage.xml

@@ -1,0 +1,16 @@
+fastapi>=0.100.0
+uvicorn>=0.30.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+asyncpg>=0.28.0
+pyotp>=2.9.0
+geoip2>=4.7.0
+pandas>=2.0.0
+plotly>=5.18.0
+python-multipart>=0.0.6
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+requests>=2.31.0
+PyYAML>=6.0.1

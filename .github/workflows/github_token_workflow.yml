@@ -1,0 +1,29 @@
+name: GitHub Token Workflow
+on:
+  workflow_dispatch:
+
+jobs:
+  example_workflow:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
+      repository-projects: read
+
+    steps:
+      - name: Використання GITHUB_TOKEN для створення issue через GitHub CLI
+        run: |
+          gh issue create --title "Issue created by GitHub Actions" --body "This issue was automatically created by a workflow using GITHUB_TOKEN."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Використання GITHUB_TOKEN для виклику REST API для створення issue
+        run: |
+          curl --request POST \
+          --url https://api.github.com/repos/${{ github.repository }}/issues \
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'content-type: application/json' \
+          --data '{
+            "title": "Issue created by REST API using GITHUB_TOKEN",
+            "body": "This issue was automatically created by a workflow using GITHUB_TOKEN and REST API."
+            }'

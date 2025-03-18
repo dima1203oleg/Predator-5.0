@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+httpx
+aiohttp
+asyncpg
+psycopg2-binary
+opensearch-py
+redis
+python-telegram-bot
+jose

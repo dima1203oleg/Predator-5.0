@@ -1,0 +1,13 @@
+apiVersion: v2
+name: predator
+description: A Helm chart for Predator 5.0 deployment
+type: application
+version: 0.1.0
+appVersion: "5.0.0"
+keywords:
+  - predator
+  - api
+  - backend
+maintainers:
+  - name: DevOps Team
+    email: devops@predator.io

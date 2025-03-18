@@ -1,0 +1,45 @@
+name: Auto Push Changes
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'   # Кожні 2 години
+  workflow_dispatch:
+
+jobs:
+  autopush:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+          
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git pull origin main
+          
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "HAS_CHANGES=true" >> $GITHUB_OUTPUT
+          else
+            echo "HAS_CHANGES=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run optimize and push script
+        if: steps.check_changes.outputs.HAS_CHANGES == 'true'
+        run: |
+          chmod +x ./scripts/auto_optimize.sh
+          ./scripts/auto_optimize.sh
+          
+          # Commit and push changes
+          git add .
+          git commit -m "Auto-commit: $(date '+%Y-%m-%d %H:%M:%S')"
+          git push origin main
+      
+      - name: No changes detected
+        if: steps.check_changes.outputs.HAS_CHANGES == 'false'
+        run: echo "No changes detected"

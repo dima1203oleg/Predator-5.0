@@ -1,0 +1,44 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    branches: [main, master]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service --cluster production --service predator-analytics --force-new-deployment
+        
+      - name: Wait for service stability
+        run: |
+          aws ecs wait services-stable --cluster production --services predator-analytics
+      
+      - name: Notify on success
+        if: success()
+        uses: slackapi/slack-github-action@v1.21.0
+        with:
+          channel-id: 'deployments'
+          slack-message: "Deployment успішний :rocket: \nService: predator-analytics\nBranch: ${{ github.ref }}"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
